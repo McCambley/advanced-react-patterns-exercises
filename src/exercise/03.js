@@ -26,6 +26,13 @@ function Toggle({children}) {
   // })
 }
 
+const useToggle = () => {
+  const contextValue = React.useContext(ToggleContext)
+  if (!contextValue)
+    throw new Error('useToggle must be wrapped in a <Toggle />')
+  return contextValue
+}
+
 // 🐨 we'll still get the children from props (as it's passed to us by the
 // developers using our component), but we'll get `on` implicitly from
 // ToggleContext now
@@ -46,8 +53,9 @@ function ToggleOff({children}) {
 
 // 🐨 get `on` and `toggle` from the ToggleContext with `useContext`
 function ToggleButton(props) {
-  const {on, toggle} = React.useContext(ToggleContext)
-  return <Switch on={on} onClick={toggle} {...props} />
+  const {on, toggle} = useToggle()
+
+  if (!on || !toggle) return <Switch on={on} onClick={toggle} {...props} />
 }
 
 function App() {
