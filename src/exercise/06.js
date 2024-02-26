@@ -5,6 +5,28 @@ import * as React from 'react'
 import {Switch} from '../switch'
 import warning from 'warning'
 
+const useControlledSwitchWarning = ({onChange, on, readOnly}) => {
+  const onIsControlled = typeof on !== 'undefined'
+
+  // WARNINGS
+  const hasOnChange = Boolean(onChange)
+  React.useEffect(() => {
+    warning(
+      !(!hasOnChange && onIsControlled && !readOnly),
+      'A controlled toggle must have an onChange handler',
+    )
+  }, [hasOnChange, onIsControlled, readOnly])
+  const {current: onWasControlled} = React.useRef(onIsControlled)
+  React.useEffect(() => {
+    warning(
+      onIsControlled === onWasControlled,
+      `Uh oh! This toggle ${
+        onWasControlled ? 'was' : 'was not'
+      } controlled and now it ${onWasControlled ? 'is not' : 'is'}.`,
+    )
+  }, [onIsControlled, onWasControlled])
+}
+
 const callAll =
   (...fns) =>
   (...args) =>
@@ -40,7 +62,8 @@ function useToggle({
 } = {}) {
   const {current: initialState} = React.useRef({on: initialOn})
   const [state, dispatch] = React.useReducer(reducer, initialState)
-  // }
+  useControlledSwitchWarning({onChange, controlledOn, readOnly})
+
   // 🐨 determine whether on is controlled and assign that to `onIsControlled`
   // 💰 `controlledOn != null`
   const onIsControlled = typeof controlledOn !== 'undefined'
@@ -50,14 +73,6 @@ function useToggle({
   // const {on} = state
   const on = onIsControlled ? controlledOn : state.on
 
-  // WARNINGS
-  const hasOnChange = Boolean(onChange)
-  React.useEffect(() => {
-    warning(
-      !(!hasOnChange && onIsControlled && !readOnly),
-      'A controlled toggle must have an onChange handler',
-    )
-  }, [hasOnChange, onIsControlled, readOnly])
   // We want to call `onChange` any time we need to make a state change, but we
   // only want to call `dispatch` if `!onIsControlled` (otherwise we could get
   // unnecessary renders).
