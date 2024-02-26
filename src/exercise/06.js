@@ -5,6 +5,7 @@ import * as React from 'react'
 import {Switch} from '../switch'
 import warning from 'warning'
 
+// This could be generalized... but it's late and I'm tired.
 const useControlledSwitchWarning = ({onChange, on, readOnly}) => {
   const onIsControlled = typeof on !== 'undefined'
 
