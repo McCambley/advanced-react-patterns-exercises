@@ -6,6 +6,7 @@ import {Switch} from '../switch'
 import warning from 'warning'
 
 // This could be generalized... but it's late and I'm tired.
+// Also I don't need the read only props... this should just be the controlled stuff
 const useControlledSwitchWarning = ({onChange, on, readOnly}) => {
   const onIsControlled = typeof on !== 'undefined'
 
