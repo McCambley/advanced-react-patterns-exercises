@@ -4,6 +4,11 @@
 import * as React from 'react'
 import {Switch} from '../switch'
 
+const actionTypes = {
+  toggle: 'toggle',
+  reset: 'reset',
+}
+
 const callAll =
   (...fns) =>
   (...args) =>
@@ -11,10 +16,10 @@ const callAll =
 
 function toggleReducer(state, {type, initialState}) {
   switch (type) {
-    case 'toggle': {
+    case actionTypes.toggle: {
       return {on: !state.on}
     }
-    case 'reset': {
+    case actionTypes.reset: {
       return initialState
     }
     default: {
@@ -32,8 +37,8 @@ function useToggle({initialOn = false, reducer = toggleReducer} = {}) {
   const [state, dispatch] = React.useReducer(reducer, initialState)
   const {on} = state
 
-  const toggle = () => dispatch({type: 'toggle'})
-  const reset = () => dispatch({type: 'reset', initialState})
+  const toggle = () => dispatch({type: actionTypes.toggle})
+  const reset = () => dispatch({type: actionTypes.reset, initialState})
 
   function getTogglerProps({onClick, ...props} = {}) {
     return {
@@ -65,7 +70,7 @@ function App() {
 
   function toggleStateReducer(state, action) {
     const changes = toggleReducer(state, action)
-    if (clickedTooMuch && action.type === 'toggle') {
+    if (clickedTooMuch && action.type === actionTypes.toggle) {
       return {...changes, on: state.on}
     } else {
       return changes
