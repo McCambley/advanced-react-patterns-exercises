@@ -32,17 +32,21 @@ function useToggle({
   initialOn = false,
   reducer = toggleReducer,
   // 🐨 add an `onChange` prop.
+  onChange,
   // 🐨 add an `on` option here
   // 💰 you can alias it to `controlledOn` to avoid "variable shadowing."
+  on: controlledOn,
 } = {}) {
   const {current: initialState} = React.useRef({on: initialOn})
   const [state, dispatch] = React.useReducer(reducer, initialState)
   // 🐨 determine whether on is controlled and assign that to `onIsControlled`
   // 💰 `controlledOn != null`
+  const onIsControlled = typeof controlledOn !== 'undefined'
 
   // 🐨 Replace the next line with `const on = ...` which should be `controlledOn` if
   // `onIsControlled`, otherwise, it should be `state.on`.
-  const {on} = state
+  // const {on} = state
+  const on = onIsControlled ? controlledOn : state.on
 
   // We want to call `onChange` any time we need to make a state change, but we
   // only want to call `dispatch` if `!onIsControlled` (otherwise we could get
@@ -52,6 +56,14 @@ function useToggle({
   // 1. accept an action
   // 2. if onIsControlled is false, call dispatch with that action
   // 3. Then call `onChange` with our "suggested changes" and the action.
+  const dispatchWithOnChange = action => {
+    if (!onIsControlled) {
+      return dispatch(action)
+    } else {
+      const changes = reducer({...state, on}, action)
+      return onChange ? onChange(changes, action) : changes
+    }
+  }
 
   // 🦉 "Suggested changes" refers to: the changes we would make if we were
   // managing the state ourselves. This is similar to how a controlled <input />
